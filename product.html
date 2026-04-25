@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Товар — BAHA</title>
+  <meta name="description" content="Отзывы и рейтинг товара на BAHA — рейтинг товаров Туркменистана">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="container">
+      <a href="index.html" class="logo">BAHA<span class="logo-dot">.</span></a>
+      <nav class="nav">
+        <button class="lang-switcher" id="langToggle">TM</button>
+        <div id="userArea" style="display:none"></div>
+        <a href="#" class="btn-login" id="loginBtn"
+           data-ru="Войти" data-tm="Giriş">Войти</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="container">
+    <nav class="breadcrumb" id="breadcrumb">
+      <a href="index.html" data-ru="Главная" data-tm="Baş sahypa">Главная</a>
+      <span class="breadcrumb-sep">›</span>
+      <span data-ru="Загрузка..." data-tm="Ýüklenýär...">Загрузка...</span>
+    </nav>
+  </div>
+
+  <!-- ===== PRODUCT DETAIL ===== -->
+  <div class="container">
+    <div id="productDetail">
+      <!-- Skeleton while loading -->
+      <div class="product-hero">
+        <div class="product-image-box skeleton" style="height:280px;font-size:0"></div>
+        <div style="padding-top:8px">
+          <div class="skeleton" style="height:20px;width:100px;border-radius:20px;margin-bottom:14px"></div>
+          <div class="skeleton" style="height:40px;width:80%;border-radius:8px;margin-bottom:10px"></div>
+          <div class="skeleton" style="height:18px;width:40%;border-radius:8px;margin-bottom:20px"></div>
+          <div class="skeleton" style="height:60px;width:60%;border-radius:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AD BANNER ===== -->
+  <div class="container">
+    <div class="ad-placeholder" style="margin:8px 0 24px">
+      <!-- Replace with AdSense code -->
+      <span data-ru="Реклама · Google AdSense"
+            data-tm="Reklama · Google AdSense">
+        Реклама · Google AdSense
+      </span>
+    </div>
+  </div>
+
+  <!-- ===== REVIEWS SECTION ===== -->
+  <section class="reviews-section">
+    <div class="container">
+      <div class="reviews-header">
+        <h2 data-ru="Отзывы покупателей"
+            data-tm="Alyjylaryň synlary">Отзывы покупателей</h2>
+        <select class="sort-select" id="sortSelect">
+          <option value="newest"
+                  data-ru="Сначала новые" data-tm="Täzeler ilki">Сначала новые</option>
+          <option value="highest"
+                  data-ru="Высокая оценка" data-tm="Ýokary baha">Высокая оценка</option>
+          <option value="lowest"
+                  data-ru="Низкая оценка"  data-tm="Pes baha">Низкая оценка</option>
+        </select>
+      </div>
+      <div id="reviewsList">
+        <!-- Reviews loaded by JS -->
+        <div class="review-card skeleton" style="height:100px"></div>
+        <div class="review-card skeleton" style="height:100px;margin-top:14px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WRITE REVIEW MODAL ===== -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal">
+      <h2 class="modal-title"
+          data-ru="Написать отзыв" data-tm="Syn ýaz">Написать отзыв</h2>
+      <p class="modal-subtitle" id="modalProductName"></p>
+
+      <form id="reviewForm" novalidate>
+
+        <!-- Star Rating Input -->
+        <div class="star-input-group">
+          <label class="star-input-label"
+                 data-ru="Ваша оценка *" data-tm="Siziň bahaňyz *">
+            Ваша оценка *
+          </label>
+          <div class="star-input">
+            <input type="radio" id="star5" name="stars" value="5" required>
+            <label for="star5" title="5">★</label>
+            <input type="radio" id="star4" name="stars" value="4">
+            <label for="star4" title="4">★</label>
+            <input type="radio" id="star3" name="stars" value="3">
+            <label for="star3" title="3">★</label>
+            <input type="radio" id="star2" name="stars" value="2">
+            <label for="star2" title="2">★</label>
+            <input type="radio" id="star1" name="stars" value="1">
+            <label for="star1" title="1">★</label>
+          </div>
+        </div>
+
+        <!-- Review Text -->
+        <div class="form-group">
+          <label class="form-label" for="reviewText"
+                 data-ru="Ваш отзыв" data-tm="Siziň synyňyz">Ваш отзыв</label>
+          <textarea
+            id="reviewText"
+            class="form-textarea"
+            rows="4"
+            maxlength="1000"
+            data-placeholder-ru="Расскажите о своём опыте использования товара..."
+            data-placeholder-tm="Harydyň ulanylyşy barada tejribäňizi paýlaşyň..."
+            placeholder="Расскажите о своём опыте использования товара..."
+          ></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="submitReviewBtn"
+                  data-ru="Опубликовать" data-tm="Çap et">Опубликовать</button>
+          <button type="button" class="btn-cancel" id="closeModal"
+                  data-ru="Отмена" data-tm="Ýatyr">Отмена</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <a href="index.html" class="logo">BAHA<span class="logo-dot">.</span></a>
+      <p style="margin-top:6px"
+         data-ru="© 2024 · Рейтинг товаров Туркменистана"
+         data-tm="© 2024 · Türkmenistanyň haryt bahasy">
+        © 2024 · Рейтинг товаров Туркменистана
+      </p>
+    </div>
+  </footer>
+
+  <!-- Firebase + App -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
