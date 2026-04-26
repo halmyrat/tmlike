@@ -695,15 +695,10 @@
 <div class="toast" id="toast"></div>
 
 <!-- Firebase -->
-<script type="module">
-import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, doc, addDoc, getDocs,
-         deleteDoc, query, orderBy, limit, serverTimestamp
-       }                    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-// ── Pull config from firebase-config.js ──
-// We inline a minimal version here so admin.html is self-contained.
-// IMPORTANT: Replace with your actual firebaseConfig values.
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+// ── Firebase Init ──
 const firebaseConfig = {
   apiKey:            "AIzaSyBXGQ5w7XkqaQOw0O9cHR2uF65sr8A2wF8",
   authDomain:        "tmlikeonline.firebaseapp.com",
@@ -713,40 +708,33 @@ const firebaseConfig = {
   appId:             "1:788385897433:web:df47ea2c1cee52783ed7c8"
 };
 
-let db;
+let db = null;
 let allProducts = [];
 let allCategories = [];
 
-// ── INIT ──
 try {
-  const app = initializeApp(firebaseConfig, 'admin');
-  db = getFirestore(app);
+  const app = firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
   document.getElementById('fbStatus').textContent = '⬤ Firebase OK';
-  document.getElementById('fbStatus').className = 'badge badge-success';
+  document.getElementById('fbStatus').className   = 'badge badge-success';
 } catch(e) {
   document.getElementById('fbStatus').textContent = '⬤ Нет Firebase';
-  document.getElementById('fbStatus').className = 'badge badge-danger';
+  document.getElementById('fbStatus').className   = 'badge badge-danger';
 }
 
 // ── LOAD DATA ──
 async function loadAll() {
-  if (!db) return;
+  if (!db) { loadDemoData(); return; }
   try {
-    // Products
-    const pSnap = await getDocs(query(collection(db,'products'), orderBy('createdAt','desc')));
-    allProducts = [];
-    pSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
+    const pSnap = await db.collection('products').orderBy('createdAt','desc').get();
+    allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Categories
-    const cSnap = await getDocs(collection(db,'categories'));
-    allCategories = [];
-    cSnap.forEach(d => allCategories.push({ id: d.id, ...d.data() }));
+    const cSnap = await db.collection('categories').get();
+    allCategories = cSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Reviews count
-    const rSnap = await getDocs(collection(db,'reviews'));
-    let reviewCount = 0; rSnap.forEach(() => reviewCount++);
+    const rSnap = await db.collection('reviews').get();
 
-    renderStats(allProducts, reviewCount, allCategories);
+    renderStats(allProducts, rSnap.size, allCategories);
     renderRecentTable(allProducts.slice(0,6));
     renderManageTable(allProducts);
     renderCategoryList(allCategories);
@@ -758,19 +746,18 @@ async function loadAll() {
 }
 
 function loadDemoData() {
-  allProducts = [
-    { id:'d1', name_ru:'Toyota Camry',        brand:'Toyota',  category:'cars',  emoji:'🚗', avgRating:4.7, reviewCount:124 },
-    { id:'d2', name_ru:'Samsung Galaxy S24',  brand:'Samsung', category:'phones',emoji:'📱', avgRating:4.5, reviewCount:89  },
-    { id:'d3', name_ru:'Оливковое масло Borges', brand:'Borges', category:'food', emoji:'🫒', avgRating:4.8, reviewCount:56  },
-  ];
+  allProducts   = [];
   allCategories = [
     { id:'c1', slug:'cars',       name_ru:'Автомобили',  name_tm:'Awtomobiller', emoji:'🚗' },
     { id:'c2', slug:'phones',     name_ru:'Телефоны',    name_tm:'Telefonlar',   emoji:'📱' },
     { id:'c3', slug:'food',       name_ru:'Продукты',    name_tm:'Azyk',         emoji:'🫒' },
     { id:'c4', slug:'appliances', name_ru:'Техника',     name_tm:'Tehnika',      emoji:'🏠' },
-    { id:'c5', slug:'internet',   name_ru:'Интернет',    name_tm:'Internet',     emoji:'📡' },
+    { id:'c5', slug:'cosmetics',  name_ru:'Косметика',   name_tm:'Kosmetika',    emoji:'💄' },
+    { id:'c6', slug:'medicine',   name_ru:'Аптека',      name_tm:'Dermanhana',   emoji:'💊' },
+    { id:'c7', slug:'clothing',   name_ru:'Одежда',      name_tm:'Egin-eşik',    emoji:'👕' },
+    { id:'c8', slug:'internet',   name_ru:'Интернет',    name_tm:'Internet',     emoji:'📡' },
   ];
-  renderStats(allProducts, 269, allCategories);
+  renderStats(allProducts, 0, allCategories);
   renderRecentTable(allProducts);
   renderManageTable(allProducts);
   renderCategoryList(allCategories);
@@ -787,24 +774,33 @@ function renderStats(products, reviews, cats) {
   document.getElementById('statRating').textContent = avg;
 }
 
+function starsHtml(n) {
+  return '★'.repeat(Math.round(n||0)) + '☆'.repeat(5-Math.round(n||0));
+}
+
 function renderRecentTable(products) {
   const tb = document.getElementById('recentProductsTable');
-  if (!products.length) { tb.innerHTML = `<tr><td colspan="6" class="empty-table">Нет товаров</td></tr>`; return; }
+  if (!products.length) {
+    tb.innerHTML = '<tr><td colspan="6" class="empty-table">Товаров пока нет — добавьте первый!</td></tr>';
+    return;
+  }
   tb.innerHTML = products.map(p => `
     <tr>
       <td class="product-thumb">${p.emoji||'📦'}</td>
       <td style="font-weight:500">${p.name_ru}</td>
       <td style="color:var(--text-muted)">${p.brand||''}</td>
       <td><span class="badge badge-warn">${p.category||''}</span></td>
-      <td><span class="stars-sm">${'★'.repeat(Math.round(p.avgRating||0))}</span> ${(p.avgRating||0).toFixed(1)}</td>
+      <td><span class="stars-sm">${starsHtml(p.avgRating)}</span> ${(p.avgRating||0).toFixed(1)}</td>
       <td>${p.reviewCount||0}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
 function renderManageTable(products) {
   const tb = document.getElementById('manageTable');
-  if (!products.length) { tb.innerHTML = `<tr><td colspan="7" class="empty-table">Нет товаров</td></tr>`; return; }
+  if (!products.length) {
+    tb.innerHTML = '<tr><td colspan="7" class="empty-table">Товаров пока нет</td></tr>';
+    return;
+  }
   tb.innerHTML = products.map(p => `
     <tr data-name="${(p.name_ru||'').toLowerCase()}" data-cat="${p.category||''}">
       <td class="product-thumb">${p.emoji||'📦'}</td>
@@ -816,16 +812,16 @@ function renderManageTable(products) {
       <td><span class="badge badge-warn">${p.category||''}</span></td>
       <td>${(p.avgRating||0).toFixed(1)} ★</td>
       <td>${p.reviewCount||0}</td>
-      <td>
-        <button class="btn-danger" onclick="deleteProduct('${p.id}','${p.name_ru}')">🗑 Удалить</button>
-      </td>
-    </tr>
-  `).join('');
+      <td><button class="btn-danger" onclick="deleteProduct('${p.id}','${p.name_ru.replace(/'/g,"\'")}')">🗑 Удалить</button></td>
+    </tr>`).join('');
 }
 
 function renderCategoryList(cats) {
   const el = document.getElementById('categoryList');
-  if (!cats.length) { el.innerHTML = `<div style="font-size:13px;color:var(--text-muted)">Нет категорий</div>`; return; }
+  if (!cats.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-muted)">Нет категорий</div>';
+    return;
+  }
   el.innerHTML = cats.map(c => `
     <div class="cat-row">
       <div class="cat-row-left">
@@ -835,29 +831,21 @@ function renderCategoryList(cats) {
           <div style="font-size:12px;color:var(--text-muted)">${c.name_tm} · <code style="font-size:11px">${c.slug}</code></div>
         </div>
       </div>
-      <button class="btn-danger" onclick="deleteCategory('${c.id}','${c.name_ru}')">🗑</button>
-    </div>
-  `).join('');
+      <button class="btn-danger" onclick="deleteCategory('${c.id}','${c.name_ru.replace(/'/g,"\'")}')">🗑</button>
+    </div>`).join('');
 }
 
 function populateCategorySelects(cats) {
-  const selects = ['pCategory', 'manageCatFilter'];
-  const defaultCats = [
-    { slug:'cars',name_ru:'Автомобили' }, { slug:'phones',name_ru:'Телефоны' },
-    { slug:'food',name_ru:'Продукты'  }, { slug:'appliances',name_ru:'Техника' },
-    { slug:'cosmetics',name_ru:'Косметика' }, { slug:'medicine',name_ru:'Аптека' },
-    { slug:'clothing',name_ru:'Одежда' }, { slug:'internet',name_ru:'Интернет' },
-  ];
-  const allCats = cats.length ? cats : defaultCats;
-  selects.forEach(id => {
+  ['pCategory','manageCatFilter'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
-    const firstOption = sel.options[0];
+    const first = sel.options[0];
     sel.innerHTML = '';
-    sel.appendChild(firstOption);
-    allCats.forEach(c => {
+    sel.appendChild(first);
+    cats.forEach(c => {
       const opt = document.createElement('option');
-      opt.value = c.slug; opt.textContent = `${c.emoji||''} ${c.name_ru}`;
+      opt.value = c.slug;
+      opt.textContent = (c.emoji||'') + ' ' + c.name_ru;
       sel.appendChild(opt);
     });
   });
@@ -868,7 +856,6 @@ window.submitProduct = async function(e) {
   e.preventDefault();
   const btn = document.getElementById('productSubmitBtn');
   btn.disabled = true; btn.textContent = 'Сохраняем...';
-
   const data = {
     name_ru:     document.getElementById('pNameRu').value.trim(),
     name_tm:     document.getElementById('pNameTm').value.trim(),
@@ -877,18 +864,17 @@ window.submitProduct = async function(e) {
     emoji:       document.getElementById('pEmoji').value,
     avgRating:   0,
     reviewCount: 0,
-    createdAt:   serverTimestamp()
+    createdAt:   firebase.firestore.FieldValue.serverTimestamp()
   };
-
   try {
     if (db) {
-      await addDoc(collection(db, 'products'), data);
+      await db.collection('products').add(data);
       showAlert('productAlert', '✓ Товар успешно добавлен!', 'success');
       document.getElementById('productForm').reset();
       selectEmoji('🚗');
       await loadAll();
     } else {
-      showAlert('productAlert', 'Firebase не настроен. Настройте firebaseConfig.', 'error');
+      showAlert('productAlert', 'Firebase не подключён.', 'error');
     }
   } catch(err) {
     showAlert('productAlert', 'Ошибка: ' + err.message, 'error');
@@ -902,22 +888,20 @@ window.submitCategory = async function(e) {
   e.preventDefault();
   const btn = document.getElementById('catSubmitBtn');
   btn.disabled = true; btn.textContent = 'Сохраняем...';
-
   const data = {
     name_ru: document.getElementById('cNameRu').value.trim(),
     name_tm: document.getElementById('cNameTm').value.trim(),
     slug:    document.getElementById('cSlug').value.trim().toLowerCase(),
     emoji:   document.getElementById('cEmoji').value.trim(),
   };
-
   try {
     if (db) {
-      await addDoc(collection(db, 'categories'), data);
+      await db.collection('categories').add(data);
       showAlert('categoryAlert', '✓ Категория добавлена!', 'success');
       document.getElementById('categoryForm').reset();
       await loadAll();
     } else {
-      showAlert('categoryAlert', 'Firebase не настроен.', 'error');
+      showAlert('categoryAlert', 'Firebase не подключён.', 'error');
     }
   } catch(err) {
     showAlert('categoryAlert', 'Ошибка: ' + err.message, 'error');
@@ -928,38 +912,36 @@ window.submitCategory = async function(e) {
 
 // ── DELETE ──
 window.deleteProduct = async function(id, name) {
-  if (!confirm(`Удалить "${name}"?`)) return;
+  if (!confirm('Удалить "' + name + '"?')) return;
   try {
-    if (db) { await deleteDoc(doc(db, 'products', id)); await loadAll(); }
-    showToast('Товар удалён', 'success');
-  } catch(e) { showToast('Ошибка удаления', 'error'); }
+    if (db) { await db.collection('products').doc(id).delete(); await loadAll(); }
+    showToast('Товар удалён');
+  } catch(e) { showToast('Ошибка удаления'); }
 };
 
 window.deleteCategory = async function(id, name) {
-  if (!confirm(`Удалить категорию "${name}"?`)) return;
+  if (!confirm('Удалить категорию "' + name + '"?')) return;
   try {
-    if (db) { await deleteDoc(doc(db, 'categories', id)); await loadAll(); }
-    showToast('Категория удалена', 'success');
-  } catch(e) { showToast('Ошибка удаления', 'error'); }
+    if (db) { await db.collection('categories').doc(id).delete(); await loadAll(); }
+    showToast('Категория удалена');
+  } catch(e) { showToast('Ошибка удаления'); }
 };
 
 // ── FILTER ──
 window.filterManageTable = function() {
-  const q    = document.getElementById('manageSearch').value.toLowerCase();
-  const cat  = document.getElementById('manageCatFilter').value;
+  const q   = (document.getElementById('manageSearch').value || '').toLowerCase();
+  const cat = document.getElementById('manageCatFilter').value;
   document.querySelectorAll('#manageTable tr').forEach(row => {
-    const name = row.dataset.name || '';
-    const rc   = row.dataset.cat || '';
-    const show = name.includes(q) && (!cat || rc === cat);
-    row.style.display = show ? '' : 'none';
+    const nm = row.dataset.name || '';
+    const rc = row.dataset.cat  || '';
+    row.style.display = nm.includes(q) && (!cat || rc === cat) ? '' : 'none';
   });
 };
 
-// ── HELPERS ──
 function showAlert(id, msg, type) {
   const el = document.getElementById(id);
   el.textContent = msg;
-  el.className = `alert alert-${type} visible`;
+  el.className = 'alert alert-' + type + ' visible';
   setTimeout(() => el.classList.remove('visible'), 4000);
 }
 
@@ -970,8 +952,8 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ── INIT ──
-loadAll();
+// Auto-load once admin is visible
+document.addEventListener('DOMContentLoaded', () => { loadAll(); });
 </script>
 
 <script>
