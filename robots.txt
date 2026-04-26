@@ -1,0 +1,13 @@
+# BAHA - tmlike.online
+# Robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+# Sitemap location
+Sitemap: https://tmlike.online/sitemap.xml
+
+# Allow Google AdSense crawler
+User-agent: Mediapartners-Google
+Allow: /

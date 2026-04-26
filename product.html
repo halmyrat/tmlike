@@ -3,8 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Товар — BAHA</title>
-  <meta name="description" content="Отзывы и рейтинг товара на BAHA — рейтинг товаров Туркменистана">
+
+  <!-- Dynamic SEO — updated by app.js after product loads -->
+  <title>Отзывы о товаре — BAHA Туркменистан</title>
+  <meta name="description"  content="Читайте отзывы и рейтинг товара на BAHA — честные отзывы покупателей Туркменистана." id="metaDesc">
+  <meta name="robots"       content="index, follow">
+  <link rel="canonical"     href="https://tmlike.online/product.html" id="canonicalTag">
+
+  <!-- Open Graph — updated dynamically -->
+  <meta property="og:type"        content="product">
+  <meta property="og:url"         content="https://tmlike.online/product.html" id="ogUrl">
+  <meta property="og:title"       content="Отзывы — BAHA" id="ogTitle">
+  <meta property="og:description" content="Отзывы и рейтинг на BAHA Туркменистан" id="ogDesc">
+  <meta property="og:image"       content="https://tmlike.online/og-image.png">
+  <meta property="og:site_name"   content="BAHA">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary">
+  <meta name="twitter:title"       content="Отзывы — BAHA" id="twTitle">
+  <meta name="twitter:description" content="Рейтинг и отзывы покупателей Туркменистана" id="twDesc">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>">
+
+  <!-- JSON-LD Product+Review schema — injected by app.js -->
+  <script type="application/ld+json" id="productSchema">{}</script>
+
+  <!-- Google AdSense — replace YOUR_CLIENT_ID after approval -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_CLIENT_ID" crossorigin="anonymous"></script> -->
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -34,7 +61,6 @@
   <!-- ===== PRODUCT DETAIL ===== -->
   <div class="container">
     <div id="productDetail">
-      <!-- Skeleton while loading -->
       <div class="product-hero">
         <div class="product-image-box skeleton" style="height:280px;font-size:0"></div>
         <div style="padding-top:8px">
@@ -50,9 +76,8 @@
   <!-- ===== AD BANNER ===== -->
   <div class="container">
     <div class="ad-placeholder" style="margin:8px 0 24px">
-      <!-- Replace with AdSense code -->
-      <span data-ru="Реклама · Google AdSense"
-            data-tm="Reklama · Google AdSense">
+      <!-- Replace with AdSense in-article code after approval -->
+      <span data-ru="Реклама · Google AdSense" data-tm="Reklama · Google AdSense">
         Реклама · Google AdSense
       </span>
     </div>
@@ -62,19 +87,14 @@
   <section class="reviews-section">
     <div class="container">
       <div class="reviews-header">
-        <h2 data-ru="Отзывы покупателей"
-            data-tm="Alyjylaryň synlary">Отзывы покупателей</h2>
+        <h2 data-ru="Отзывы покупателей" data-tm="Alyjylaryň synlary">Отзывы покупателей</h2>
         <select class="sort-select" id="sortSelect">
-          <option value="newest"
-                  data-ru="Сначала новые" data-tm="Täzeler ilki">Сначала новые</option>
-          <option value="highest"
-                  data-ru="Высокая оценка" data-tm="Ýokary baha">Высокая оценка</option>
-          <option value="lowest"
-                  data-ru="Низкая оценка"  data-tm="Pes baha">Низкая оценка</option>
+          <option value="newest"  data-ru="Сначала новые"  data-tm="Täzeler ilki">Сначала новые</option>
+          <option value="highest" data-ru="Высокая оценка" data-tm="Ýokary baha">Высокая оценка</option>
+          <option value="lowest"  data-ru="Низкая оценка"  data-tm="Pes baha">Низкая оценка</option>
         </select>
       </div>
       <div id="reviewsList">
-        <!-- Reviews loaded by JS -->
         <div class="review-card skeleton" style="height:100px"></div>
         <div class="review-card skeleton" style="height:100px;margin-top:14px"></div>
       </div>
@@ -84,18 +104,11 @@
   <!-- ===== WRITE REVIEW MODAL ===== -->
   <div class="modal-overlay" id="reviewModal">
     <div class="modal">
-      <h2 class="modal-title"
-          data-ru="Написать отзыв" data-tm="Syn ýaz">Написать отзыв</h2>
+      <h2 class="modal-title" data-ru="Написать отзыв" data-tm="Syn ýaz">Написать отзыв</h2>
       <p class="modal-subtitle" id="modalProductName"></p>
-
       <form id="reviewForm" novalidate>
-
-        <!-- Star Rating Input -->
         <div class="star-input-group">
-          <label class="star-input-label"
-                 data-ru="Ваша оценка *" data-tm="Siziň bahaňyz *">
-            Ваша оценка *
-          </label>
+          <label class="star-input-label" data-ru="Ваша оценка *" data-tm="Siziň bahaňyz *">Ваша оценка *</label>
           <div class="star-input">
             <input type="radio" id="star5" name="stars" value="5" required>
             <label for="star5" title="5">★</label>
@@ -109,23 +122,14 @@
             <label for="star1" title="1">★</label>
           </div>
         </div>
-
-        <!-- Review Text -->
         <div class="form-group">
           <label class="form-label" for="reviewText"
                  data-ru="Ваш отзыв" data-tm="Siziň synyňyz">Ваш отзыв</label>
-          <textarea
-            id="reviewText"
-            class="form-textarea"
-            rows="4"
-            maxlength="1000"
+          <textarea id="reviewText" class="form-textarea" rows="4" maxlength="1000"
             data-placeholder-ru="Расскажите о своём опыте использования товара..."
             data-placeholder-tm="Harydyň ulanylyşy barada tejribäňizi paýlaşyň..."
-            placeholder="Расскажите о своём опыте использования товара..."
-          ></textarea>
+            placeholder="Расскажите о своём опыте использования товара..."></textarea>
         </div>
-
-        <!-- Actions -->
         <div class="form-actions">
           <button type="submit" class="btn-submit" id="submitReviewBtn"
                   data-ru="Опубликовать" data-tm="Çap et">Опубликовать</button>
@@ -148,7 +152,6 @@
     </div>
   </footer>
 
-  <!-- Firebase + App -->
   <script type="module" src="app.js"></script>
 </body>
 </html>

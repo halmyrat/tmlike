@@ -307,7 +307,38 @@ function renderProduct(p) {
     </div>
   `;
 
-  document.title = `${name} — BAHA`;
+  // === Dynamic SEO tags ===
+  const desc = `Отзывы о ${name} (${p.brand||''}) — рейтинг ${(p.avgRating||0).toFixed(1)}★ от ${p.reviewCount||0} покупателей Туркменистана. Читайте честные отзывы на BAHA.`;
+  const url  = `https://tmlike.online/product.html?id=${p.id}`;
+
+  document.title = `${name} — отзывы и рейтинг | BAHA Туркменистан`;
+  document.querySelector('#metaDesc')?.setAttribute('content', desc);
+  document.querySelector('#canonicalTag')?.setAttribute('href', url);
+  document.querySelector('#ogTitle')?.setAttribute('content', `${name} — отзывы | BAHA`);
+  document.querySelector('#ogDesc')?.setAttribute('content', desc);
+  document.querySelector('#ogUrl')?.setAttribute('content', url);
+  document.querySelector('#twTitle')?.setAttribute('content', `${name} — отзывы | BAHA`);
+  document.querySelector('#twDesc')?.setAttribute('content', desc);
+
+  // === JSON-LD Product + AggregateRating schema ===
+  // This makes Google show ★ star ratings in search results!
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": name,
+    "brand": { "@type": "Brand", "name": p.brand || '' },
+    "description": desc,
+    "url": url,
+    "aggregateRating": p.reviewCount > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": (p.avgRating || 0).toFixed(1),
+      "reviewCount": p.reviewCount || 0,
+      "bestRating": "5",
+      "worstRating": "1"
+    } : undefined
+  };
+  const schemaEl = document.getElementById('productSchema');
+  if (schemaEl) schemaEl.textContent = JSON.stringify(schema, null, 2);
 
   // Store product id for review form
   document.getElementById('writeReviewBtn')?.addEventListener('click', () => {

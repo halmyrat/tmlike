@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1C1410"/>
+      <stop offset="50%"  stop-color="#3A1F1A"/>
+      <stop offset="100%" stop-color="#2C1A10"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Accent circle -->
+  <circle cx="1050" cy="150" r="300" fill="#B5161B" opacity="0.15"/>
+  <circle cx="150"  cy="500" r="200" fill="#C9942A" opacity="0.08"/>
+  <!-- Logo -->
+  <text x="100" y="220" font-family="Georgia, serif" font-size="120" font-weight="700" fill="#FFFDF8" letter-spacing="-4">BAHA</text>
+  <text x="100" y="220" font-family="Georgia, serif" font-size="120" font-weight="700" fill="#B5161B" letter-spacing="-4" x="524">.</text>
+  <!-- Tagline RU -->
+  <text x="100" y="310" font-family="Arial, sans-serif" font-size="38" fill="#C9942A" letter-spacing="2">РЕЙТИНГ ТОВАРОВ ТУРКМЕНИСТАНА</text>
+  <!-- Tagline TM -->
+  <text x="100" y="365" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,253,248,0.5)">Türkmenistanyň haryt bahasy we synlary</text>
+  <!-- Stars -->
+  <text x="100" y="460" font-size="52" fill="#E8A020">★★★★★</text>
+  <!-- URL -->
+  <text x="100" y="540" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,253,248,0.4)">tmlike.online</text>
+</svg>

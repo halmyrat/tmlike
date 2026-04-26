@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://tmlike.online/</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://tmlike.online/"/>
+    <xhtml:link rel="alternate" hreflang="tk" href="https://tmlike.online/?lang=tm"/>
+  </url>
+
+  <!-- Category pages -->
+  <url>
+    <loc>https://tmlike.online/?cat=cars</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=phones</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=food</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=appliances</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=cosmetics</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=medicine</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=clothing</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tmlike.online/?cat=internet</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!--
+    NOTE: Product pages are dynamically generated.
+    Once you have products in Firebase, use a script or
+    Firebase function to auto-generate product URLs here.
+    Format: https://tmlike.online/product.html?id=PRODUCT_ID
+  -->
+
+</urlset>
