@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — BAHA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary:      #B5161B;
+      --primary-dark: #8A0F13;
+      --gold:         #C9942A;
+      --bg:           #F4F4F2;
+      --surface:      #FFFFFF;
+      --text:         #1C1410;
+      --text-muted:   #6B6B6B;
+      --border:       #E0DDD8;
+      --success:      #2E7D4F;
+      --success-bg:   #EAF5EE;
+      --danger:       #B5161B;
+      --danger-bg:    #FAEAEA;
+      --warn:         #C9942A;
+      --warn-bg:      #FDF5E0;
+      --sidebar-w:    240px;
+      --font-display: 'Fraunces', serif;
+      --font-body:    'DM Sans', sans-serif;
+      --radius:       12px;
+      --shadow:       0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    button { cursor: pointer; font-family: var(--font-body); border: none; background: none; }
+    input, select, textarea { font-family: var(--font-body); }
+    a { text-decoration: none; color: inherit; }
+
+    /* ===== LOGIN SCREEN ===== */
+    #loginScreen {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #1C1410 0%, #3A1F1A 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 999;
+    }
+    #loginScreen.hidden { display: none; }
+    .login-box {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    }
+    .login-logo {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .login-logo span { color: var(--primary); }
+    .login-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
+    .login-input {
+      width: 100%; padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 15px;
+      outline: none; margin-bottom: 14px;
+      transition: border-color 0.18s;
+    }
+    .login-input:focus { border-color: var(--primary); }
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: var(--primary); color: #fff;
+      border-radius: 50px; font-size: 15px; font-weight: 500;
+      transition: background 0.2s;
+    }
+    .login-btn:hover { background: var(--primary-dark); }
+    .login-error {
+      font-size: 13px; color: var(--danger);
+      margin-top: 10px; text-align: center;
+      min-height: 18px;
+    }
+
+    /* ===== LAYOUT ===== */
+    #adminApp { display: flex; min-height: 100vh; }
+    #adminApp.hidden { display: none; }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: #1C1410;
+      color: #FFFDF8;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 50;
+    }
+    .sidebar-logo {
+      font-family: var(--font-display);
+      font-size: 22px; font-weight: 700;
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-logo span { color: var(--primary); }
+    .sidebar-label {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      padding: 20px 24px 8px;
+    }
+    .sidebar-nav { flex: 1; padding: 0 12px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 400;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+    .nav-item.active { background: var(--primary); color: #fff; font-weight: 500; }
+    .nav-icon { font-size: 17px; width: 22px; text-align: center; }
+    .sidebar-bottom {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 13px; color: rgba(255,255,255,0.4);
+    }
+    .sidebar-bottom a { color: rgba(255,255,255,0.6); }
+    .sidebar-bottom a:hover { color: #fff; }
+
+    /* Main content */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      display: flex; flex-direction: column;
+    }
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 40;
+    }
+    .topbar-title { font-family: var(--font-display); font-size: 19px; font-weight: 600; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .badge-success { background: var(--success-bg); color: var(--success); }
+    .badge-warn    { background: var(--warn-bg);    color: var(--warn); }
+    .badge-danger  { background: var(--danger-bg);  color: var(--danger); }
+
+    .content { padding: 32px; }
+
+    /* ===== TABS (pages) ===== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== STATS CARDS ===== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+    }
+    .stat-label { font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .stat-value { font-family: var(--font-display); font-size: 34px; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    /* ===== FORMS ===== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 600;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-grid.cols3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .form-label span { color: var(--danger); }
+    .form-input, .form-select, .form-textarea {
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px; color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.18s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); background: #fff; }
+    .form-textarea { resize: vertical; min-height: 90px; }
+    .emoji-picker {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 4px;
+    }
+    .emoji-opt {
+      width: 44px; height: 44px; border-radius: 8px;
+      border: 2px solid var(--border);
+      background: var(--bg); font-size: 22px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: border-color 0.15s;
+    }
+    .emoji-opt.selected { border-color: var(--primary); background: #FFF0F0; }
+
+    .form-actions { display: flex; gap: 12px; margin-top: 22px; }
+    .btn-primary {
+      padding: 12px 28px;
+      background: var(--primary); color: #fff;
+      border-radius: 50px; font-size: 14px; font-weight: 500;
+      transition: background 0.18s;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary {
+      padding: 12px 24px;
+      border: 1.5px solid var(--border);
+      border-radius: 50px; font-size: 14px; color: var(--text-muted);
+      transition: border-color 0.18s, color 0.18s;
+    }
+    .btn-secondary:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-danger {
+      padding: 7px 14px;
+      background: var(--danger-bg); color: var(--danger);
+      border-radius: 6px; font-size: 12px; font-weight: 500;
+    }
+    .btn-danger:hover { background: #f5d0d0; }
+
+    /* ===== ALERT ===== */
+    .alert {
+      padding: 13px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert.visible { display: block; }
+    .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #b8e0c8; }
+    .alert-error   { background: var(--danger-bg);  color: var(--danger);  border: 1px solid #f0c0c0; }
+
+    /* ===== PRODUCTS TABLE ===== */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    thead th {
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--text-muted);
+      background: var(--bg); border-bottom: 1px solid var(--border);
+    }
+    tbody td { padding: 13px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAF8; }
+    .product-thumb { font-size: 26px; }
+    .stars-sm { color: #E8A020; font-size: 13px; letter-spacing: -1px; }
+    .empty-table { text-align: center; padding: 48px; color: var(--text-muted); font-size: 14px; }
+
+    /* ===== CATEGORY LIST ===== */
+    .cat-list { display: flex; flex-direction: column; gap: 10px; }
+    .cat-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .cat-row-left { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    .cat-emoji-big { font-size: 26px; }
+
+    /* ===== ADS SECTION ===== */
+    .ads-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .ad-slot {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .ad-slot-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .ad-slot-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+    .ad-slot code {
+      display: block;
+      background: #F4F4F2;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+      line-height: 1.7;
+      color: #444;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 6px; font-size: 12px; font-weight: 500;
+      transition: border-color 0.15s;
+    }
+    .copy-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #1C1410; color: #FFFDF8;
+      padding: 12px 24px; border-radius: 50px;
+      font-size: 14px; font-weight: 500;
+      z-index: 999; opacity: 0;
+      transition: transform 0.28s ease, opacity 0.28s ease;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ===== FIREBASE WARNING ===== */
+    .firebase-warning {
+      background: var(--warn-bg); border: 1px solid #E8D08A;
+      border-radius: 10px; padding: 14px 18px;
+      font-size: 13px; color: #7A5C1A;
+      margin-bottom: 24px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .form-grid { grid-template-columns: 1fr; }
+      .ads-grid { grid-template-columns: 1fr; }
+      .content { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">BAHA<span>.</span> Admin</div>
+    <p class="login-sub">Панель управления / Dolandyryş paneli</p>
+    <input type="password" class="login-input" id="adminPass" placeholder="Пароль / Açar söz" autocomplete="current-password">
+    <button class="login-btn" onclick="checkPassword()">Войти / Giriş</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN APP ===== -->
+<div id="adminApp" class="hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">BAHA<span>.</span></div>
+    <div class="sidebar-nav">
+      <div class="sidebar-label">Навигация</div>
+      <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span> Дашборд
+      </div>
+      <div class="nav-item" onclick="showPage('products')" id="nav-products">
+        <span class="nav-icon">📦</span> Добавить товар
+      </div>
+      <div class="nav-item" onclick="showPage('categories')" id="nav-categories">
+        <span class="nav-icon">🗂️</span> Категории
+      </div>
+      <div class="nav-item" onclick="showPage('manage')" id="nav-manage">
+        <span class="nav-icon">✏️</span> Управление
+      </div>
+      <div class="nav-item" onclick="showPage('ads')" id="nav-ads">
+        <span class="nav-icon">💰</span> Google Ads
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="index.html" target="_blank">← Сайт</a> &nbsp;·&nbsp;
+      <span style="cursor:pointer" onclick="logout()">Выйти</span>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">Дашборд</div>
+      <div class="topbar-right">
+        <span class="badge badge-success" id="fbStatus">⬤ Подключение...</span>
+        <a href="index.html" target="_blank" style="font-size:13px;color:var(--text-muted)">Открыть сайт →</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- =================== DASHBOARD =================== -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Товаров</div>
+            <div class="stat-value" id="statProducts">—</div>
+            <div class="stat-sub">в базе данных</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Отзывов</div>
+            <div class="stat-value" id="statReviews">—</div>
+            <div class="stat-sub">от пользователей</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Категорий</div>
+            <div class="stat-value" id="statCats">—</div>
+            <div class="stat-sub">активных</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Ср. рейтинг</div>
+            <div class="stat-value" id="statRating">—</div>
+            <div class="stat-sub">по всем товарам</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🚀 Быстрые действия</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-primary" onclick="showPage('products')">+ Добавить товар</button>
+            <button class="btn-secondary" onclick="showPage('categories')">+ Добавить категорию</button>
+            <button class="btn-secondary" onclick="showPage('ads')">💰 Настроить рекламу</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 Последние товары</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Название (RU)</th>
+                  <th>Бренд</th>
+                  <th>Категория</th>
+                  <th>Рейтинг</th>
+                  <th>Отзывы</th>
+                </tr>
+              </thead>
+              <tbody id="recentProductsTable">
+                <tr><td colspan="6" class="empty-table">Загрузка...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================== ADD PRODUCT =================== -->
+      <div class="page" id="page-products">
+        <div id="productAlert" class="alert"></div>
+
+        <div class="card">
+          <div class="card-title">📦 Добавить новый товар</div>
+          <form id="productForm" onsubmit="submitProduct(event)">
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Название (RU) <span>*</span></label>
+                <input type="text" class="form-input" id="pNameRu" placeholder="напр. Toyota Camry" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ady (TM) <span>*</span></label>
+                <input type="text" class="form-input" id="pNameTm" placeholder="mysal. Toyota Camry" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Бренд / Marka <span>*</span></label>
+                <input type="text" class="form-input" id="pBrand" placeholder="Toyota" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Категория <span>*</span></label>
+                <select class="form-select" id="pCategory" required>
+                  <option value="">— Выбрать —</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top:16px">
+              <label class="form-label">Иконка (эмодзи) <span>*</span></label>
+              <div class="emoji-picker" id="emojiPicker">
+                <div class="emoji-opt selected" data-emoji="🚗">🚗</div>
+                <div class="emoji-opt" data-emoji="📱">📱</div>
+                <div class="emoji-opt" data-emoji="🫒">🫒</div>
+                <div class="emoji-opt" data-emoji="🌾">🌾</div>
+                <div class="emoji-opt" data-emoji="🏠">🏠</div>
+                <div class="emoji-opt" data-emoji="💄">💄</div>
+                <div class="emoji-opt" data-emoji="💊">💊</div>
+                <div class="emoji-opt" data-emoji="👕">👕</div>
+                <div class="emoji-opt" data-emoji="📡">📡</div>
+                <div class="emoji-opt" data-emoji="🍫">🍫</div>
+                <div class="emoji-opt" data-emoji="🥛">🥛</div>
+                <div class="emoji-opt" data-emoji="🧴">🧴</div>
+                <div class="emoji-opt" data-emoji="🛻">🛻</div>
+                <div class="emoji-opt" data-emoji="💻">💻</div>
+                <div class="emoji-opt" data-emoji="📺">📺</div>
+                <div class="emoji-opt" data-emoji="🚿">🚿</div>
+                <div class="emoji-opt" data-emoji="🔋">🔋</div>
+                <div class="emoji-opt" data-emoji="🏪">🏪</div>
+              </div>
+              <input type="hidden" id="pEmoji" value="🚗">
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="productSubmitBtn">Добавить товар</button>
+              <button type="button" class="btn-secondary" onclick="document.getElementById('productForm').reset();selectEmoji('🚗')">Очистить</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="card" style="background:var(--warn-bg);border-color:#E8D08A">
+          <div style="font-size:13px;color:#7A5C1A;line-height:1.7">
+            <strong>💡 Совет:</strong> После добавления товара он сразу появится на сайте. Пользователи смогут оставлять отзывы. Добавь сначала 10–20 популярных товаров в каждой категории — это привлечёт первых пользователей.
+          </div>
+        </div>
+      </div>
+
+      <!-- =================== CATEGORIES =================== -->
+      <div class="page" id="page-categories">
+        <div id="categoryAlert" class="alert"></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+          <!-- Add category form -->
+          <div class="card">
+            <div class="card-title">🗂️ Добавить категорию</div>
+            <form id="categoryForm" onsubmit="submitCategory(event)">
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Название (RU) <span>*</span></label>
+                <input type="text" class="form-input" id="cNameRu" placeholder="напр. Автомобили" required>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Ady (TM) <span>*</span></label>
+                <input type="text" class="form-input" id="cNameTm" placeholder="mysal. Awtomobiller" required>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Ключ (slug) <span>*</span></label>
+                <input type="text" class="form-input" id="cSlug" placeholder="cars  (только латиница)" pattern="[a-z_]+" required>
+                <span style="font-size:11px;color:var(--text-muted)">Только строчные латинские буквы и _</span>
+              </div>
+              <div class="form-group" style="margin-bottom:14px">
+                <label class="form-label">Иконка <span>*</span></label>
+                <input type="text" class="form-input" id="cEmoji" placeholder="🚗" maxlength="4" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" id="catSubmitBtn">Добавить</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Category list -->
+          <div class="card">
+            <div class="card-title">Активные категории</div>
+            <div class="cat-list" id="categoryList">
+              <div style="font-size:13px;color:var(--text-muted)">Загрузка...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================== MANAGE PRODUCTS =================== -->
+      <div class="page" id="page-manage">
+        <div class="card">
+          <div class="card-title">✏️ Все товары</div>
+
+          <div style="margin-bottom:16px;display:flex;gap:12px">
+            <input type="text" class="form-input" id="manageSearch" placeholder="Поиск по названию..." style="max-width:300px" oninput="filterManageTable(this.value)">
+            <select class="form-select" id="manageCatFilter" style="max-width:180px" onchange="filterManageTable()">
+              <option value="">Все категории</option>
+            </select>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Название</th>
+                  <th>Бренд</th>
+                  <th>Категория</th>
+                  <th>★ Рейтинг</th>
+                  <th>Отзывов</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="manageTable">
+                <tr><td colspan="7" class="empty-table">Загрузка...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- =================== GOOGLE ADS =================== -->
+      <div class="page" id="page-ads">
+        <div class="card" style="background:var(--warn-bg);border-color:#E8D08A;margin-bottom:24px">
+          <div style="font-size:14px;color:#7A5C1A;line-height:1.8">
+            <strong>📋 Как настроить Google AdSense:</strong><br>
+            1. Зайди на <a href="https://adsense.google.com" target="_blank" style="color:#7A5C1A;text-decoration:underline">adsense.google.com</a><br>
+            2. Добавь сайт <strong>tmlike.online</strong><br>
+            3. Вставь <strong>verification code</strong> в &lt;head&gt; каждой страницы<br>
+            4. Подожди одобрения (обычно 1–14 дней)<br>
+            5. После одобрения замени плейсхолдеры ниже на реальный код
+          </div>
+        </div>
+
+        <div class="ads-grid">
+          <div class="ad-slot">
+            <div class="ad-slot-title">🔷 Верификация сайта (в &lt;head&gt;)</div>
+            <div class="ad-slot-sub">Вставить в index.html, product.html и admin.html</div>
+            <code id="codeVerify">&lt;script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+  crossorigin="anonymous"&gt;&lt;/script&gt;</code>
+            <button class="copy-btn" onclick="copyCode('codeVerify')">📋 Копировать</button>
+          </div>
+
+          <div class="ad-slot">
+            <div class="ad-slot-title">📰 Баннер — горизонтальный (728×90)</div>
+            <div class="ad-slot-sub">Под навигацией или между секциями</div>
+            <code id="codeHoriz">&lt;ins class="adsbygoogle"
+  style="display:block"
+  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+  data-ad-slot="XXXXXXXXXX"
+  data-ad-format="auto"
+  data-full-width-responsive="true"&gt;
+&lt;/ins&gt;
+&lt;script&gt;(adsbygoogle = window.adsbygoogle || []).push({});&lt;/script&gt;</code>
+            <button class="copy-btn" onclick="copyCode('codeHoriz')">📋 Копировать</button>
+          </div>
+
+          <div class="ad-slot">
+            <div class="ad-slot-title">📦 Реклама между товарами (in-feed)</div>
+            <div class="ad-slot-sub">Вставить в сетку товаров на homepage</div>
+            <code id="codeInfeed">&lt;ins class="adsbygoogle"
+  style="display:block"
+  data-ad-format="fluid"
+  data-ad-layout-key="-fb+5w+4e-db+86"
+  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+  data-ad-slot="XXXXXXXXXX"&gt;
+&lt;/ins&gt;
+&lt;script&gt;(adsbygoogle = window.adsbygoogle || []).push({});&lt;/script&gt;</code>
+            <button class="copy-btn" onclick="copyCode('codeInfeed')">📋 Копировать</button>
+          </div>
+
+          <div class="ad-slot">
+            <div class="ad-slot-title">💬 Реклама на странице товара</div>
+            <div class="ad-slot-sub">Между описанием и отзывами</div>
+            <code id="codeProduct">&lt;ins class="adsbygoogle"
+  style="display:block; text-align:center;"
+  data-ad-layout="in-article"
+  data-ad-format="fluid"
+  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+  data-ad-slot="XXXXXXXXXX"&gt;
+&lt;/ins&gt;
+&lt;script&gt;(adsbygoogle = window.adsbygoogle || []).push({});&lt;/script&gt;</code>
+            <button class="copy-btn" onclick="copyCode('codeProduct')">📋 Копировать</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:24px">
+          <div class="card-title">📈 Ожидаемый доход</div>
+          <table style="width:100%;font-size:14px;border-collapse:collapse">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:10px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted)">Посетителей/месяц</th>
+                <th style="text-align:left;padding:10px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted)">Просмотров страниц</th>
+                <th style="text-align:left;padding:10px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted)">Доход (USD)</th>
+                <th style="text-align:left;padding:10px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted)">Этап</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:12px 10px;border-bottom:1px solid var(--border)">1 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">3 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">$5 – $20</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)"><span class="badge badge-warn">Старт</span></td></tr>
+              <tr><td style="padding:12px 10px;border-bottom:1px solid var(--border)">10 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">30 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">$50 – $150</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)"><span class="badge badge-warn">Рост</span></td></tr>
+              <tr><td style="padding:12px 10px;border-bottom:1px solid var(--border)">50 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">150 000</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)">$250 – $700</td><td style="padding:12px 10px;border-bottom:1px solid var(--border)"><span class="badge badge-success">Масштаб</span></td></tr>
+              <tr><td style="padding:12px 10px">100 000</td><td style="padding:12px 10px">300 000</td><td style="padding:12px 10px">$500 – $1500</td><td style="padding:12px 10px"><span class="badge badge-success">Лидер рынка</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /adminApp -->
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, getDocs,
+         deleteDoc, query, orderBy, limit, serverTimestamp
+       }                    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// ── Pull config from firebase-config.js ──
+// We inline a minimal version here so admin.html is self-contained.
+// IMPORTANT: Replace with your actual firebaseConfig values.
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+
+let db;
+let allProducts = [];
+let allCategories = [];
+
+// ── INIT ──
+try {
+  const app = initializeApp(firebaseConfig, 'admin');
+  db = getFirestore(app);
+  document.getElementById('fbStatus').textContent = '⬤ Firebase OK';
+  document.getElementById('fbStatus').className = 'badge badge-success';
+} catch(e) {
+  document.getElementById('fbStatus').textContent = '⬤ Нет Firebase';
+  document.getElementById('fbStatus').className = 'badge badge-danger';
+}
+
+// ── LOAD DATA ──
+async function loadAll() {
+  if (!db) return;
+  try {
+    // Products
+    const pSnap = await getDocs(query(collection(db,'products'), orderBy('createdAt','desc')));
+    allProducts = [];
+    pSnap.forEach(d => allProducts.push({ id: d.id, ...d.data() }));
+
+    // Categories
+    const cSnap = await getDocs(collection(db,'categories'));
+    allCategories = [];
+    cSnap.forEach(d => allCategories.push({ id: d.id, ...d.data() }));
+
+    // Reviews count
+    const rSnap = await getDocs(collection(db,'reviews'));
+    let reviewCount = 0; rSnap.forEach(() => reviewCount++);
+
+    renderStats(allProducts, reviewCount, allCategories);
+    renderRecentTable(allProducts.slice(0,6));
+    renderManageTable(allProducts);
+    renderCategoryList(allCategories);
+    populateCategorySelects(allCategories);
+  } catch(e) {
+    console.warn('Load error:', e);
+    loadDemoData();
+  }
+}
+
+function loadDemoData() {
+  allProducts = [
+    { id:'d1', name_ru:'Toyota Camry',        brand:'Toyota',  category:'cars',  emoji:'🚗', avgRating:4.7, reviewCount:124 },
+    { id:'d2', name_ru:'Samsung Galaxy S24',  brand:'Samsung', category:'phones',emoji:'📱', avgRating:4.5, reviewCount:89  },
+    { id:'d3', name_ru:'Оливковое масло Borges', brand:'Borges', category:'food', emoji:'🫒', avgRating:4.8, reviewCount:56  },
+  ];
+  allCategories = [
+    { id:'c1', slug:'cars',       name_ru:'Автомобили',  name_tm:'Awtomobiller', emoji:'🚗' },
+    { id:'c2', slug:'phones',     name_ru:'Телефоны',    name_tm:'Telefonlar',   emoji:'📱' },
+    { id:'c3', slug:'food',       name_ru:'Продукты',    name_tm:'Azyk',         emoji:'🫒' },
+    { id:'c4', slug:'appliances', name_ru:'Техника',     name_tm:'Tehnika',      emoji:'🏠' },
+    { id:'c5', slug:'internet',   name_ru:'Интернет',    name_tm:'Internet',     emoji:'📡' },
+  ];
+  renderStats(allProducts, 269, allCategories);
+  renderRecentTable(allProducts);
+  renderManageTable(allProducts);
+  renderCategoryList(allCategories);
+  populateCategorySelects(allCategories);
+}
+
+function renderStats(products, reviews, cats) {
+  document.getElementById('statProducts').textContent = products.length;
+  document.getElementById('statReviews').textContent  = reviews;
+  document.getElementById('statCats').textContent     = cats.length;
+  const avg = products.length
+    ? (products.reduce((s,p) => s + (p.avgRating||0), 0) / products.length).toFixed(1)
+    : '—';
+  document.getElementById('statRating').textContent = avg;
+}
+
+function renderRecentTable(products) {
+  const tb = document.getElementById('recentProductsTable');
+  if (!products.length) { tb.innerHTML = `<tr><td colspan="6" class="empty-table">Нет товаров</td></tr>`; return; }
+  tb.innerHTML = products.map(p => `
+    <tr>
+      <td class="product-thumb">${p.emoji||'📦'}</td>
+      <td style="font-weight:500">${p.name_ru}</td>
+      <td style="color:var(--text-muted)">${p.brand||''}</td>
+      <td><span class="badge badge-warn">${p.category||''}</span></td>
+      <td><span class="stars-sm">${'★'.repeat(Math.round(p.avgRating||0))}</span> ${(p.avgRating||0).toFixed(1)}</td>
+      <td>${p.reviewCount||0}</td>
+    </tr>
+  `).join('');
+}
+
+function renderManageTable(products) {
+  const tb = document.getElementById('manageTable');
+  if (!products.length) { tb.innerHTML = `<tr><td colspan="7" class="empty-table">Нет товаров</td></tr>`; return; }
+  tb.innerHTML = products.map(p => `
+    <tr data-name="${(p.name_ru||'').toLowerCase()}" data-cat="${p.category||''}">
+      <td class="product-thumb">${p.emoji||'📦'}</td>
+      <td>
+        <div style="font-weight:500">${p.name_ru}</div>
+        <div style="font-size:12px;color:var(--text-muted)">${p.name_tm||''}</div>
+      </td>
+      <td>${p.brand||''}</td>
+      <td><span class="badge badge-warn">${p.category||''}</span></td>
+      <td>${(p.avgRating||0).toFixed(1)} ★</td>
+      <td>${p.reviewCount||0}</td>
+      <td>
+        <button class="btn-danger" onclick="deleteProduct('${p.id}','${p.name_ru}')">🗑 Удалить</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderCategoryList(cats) {
+  const el = document.getElementById('categoryList');
+  if (!cats.length) { el.innerHTML = `<div style="font-size:13px;color:var(--text-muted)">Нет категорий</div>`; return; }
+  el.innerHTML = cats.map(c => `
+    <div class="cat-row">
+      <div class="cat-row-left">
+        <span class="cat-emoji-big">${c.emoji}</span>
+        <div>
+          <div style="font-weight:500">${c.name_ru}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${c.name_tm} · <code style="font-size:11px">${c.slug}</code></div>
+        </div>
+      </div>
+      <button class="btn-danger" onclick="deleteCategory('${c.id}','${c.name_ru}')">🗑</button>
+    </div>
+  `).join('');
+}
+
+function populateCategorySelects(cats) {
+  const selects = ['pCategory', 'manageCatFilter'];
+  const defaultCats = [
+    { slug:'cars',name_ru:'Автомобили' }, { slug:'phones',name_ru:'Телефоны' },
+    { slug:'food',name_ru:'Продукты'  }, { slug:'appliances',name_ru:'Техника' },
+    { slug:'cosmetics',name_ru:'Косметика' }, { slug:'medicine',name_ru:'Аптека' },
+    { slug:'clothing',name_ru:'Одежда' }, { slug:'internet',name_ru:'Интернет' },
+  ];
+  const allCats = cats.length ? cats : defaultCats;
+  selects.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const firstOption = sel.options[0];
+    sel.innerHTML = '';
+    sel.appendChild(firstOption);
+    allCats.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.slug; opt.textContent = `${c.emoji||''} ${c.name_ru}`;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// ── SUBMIT PRODUCT ──
+window.submitProduct = async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('productSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Сохраняем...';
+
+  const data = {
+    name_ru:     document.getElementById('pNameRu').value.trim(),
+    name_tm:     document.getElementById('pNameTm').value.trim(),
+    brand:       document.getElementById('pBrand').value.trim(),
+    category:    document.getElementById('pCategory').value,
+    emoji:       document.getElementById('pEmoji').value,
+    avgRating:   0,
+    reviewCount: 0,
+    createdAt:   serverTimestamp()
+  };
+
+  try {
+    if (db) {
+      await addDoc(collection(db, 'products'), data);
+      showAlert('productAlert', '✓ Товар успешно добавлен!', 'success');
+      document.getElementById('productForm').reset();
+      selectEmoji('🚗');
+      await loadAll();
+    } else {
+      showAlert('productAlert', 'Firebase не настроен. Настройте firebaseConfig.', 'error');
+    }
+  } catch(err) {
+    showAlert('productAlert', 'Ошибка: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Добавить товар';
+  }
+};
+
+// ── SUBMIT CATEGORY ──
+window.submitCategory = async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('catSubmitBtn');
+  btn.disabled = true; btn.textContent = 'Сохраняем...';
+
+  const data = {
+    name_ru: document.getElementById('cNameRu').value.trim(),
+    name_tm: document.getElementById('cNameTm').value.trim(),
+    slug:    document.getElementById('cSlug').value.trim().toLowerCase(),
+    emoji:   document.getElementById('cEmoji').value.trim(),
+  };
+
+  try {
+    if (db) {
+      await addDoc(collection(db, 'categories'), data);
+      showAlert('categoryAlert', '✓ Категория добавлена!', 'success');
+      document.getElementById('categoryForm').reset();
+      await loadAll();
+    } else {
+      showAlert('categoryAlert', 'Firebase не настроен.', 'error');
+    }
+  } catch(err) {
+    showAlert('categoryAlert', 'Ошибка: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Добавить';
+  }
+};
+
+// ── DELETE ──
+window.deleteProduct = async function(id, name) {
+  if (!confirm(`Удалить "${name}"?`)) return;
+  try {
+    if (db) { await deleteDoc(doc(db, 'products', id)); await loadAll(); }
+    showToast('Товар удалён', 'success');
+  } catch(e) { showToast('Ошибка удаления', 'error'); }
+};
+
+window.deleteCategory = async function(id, name) {
+  if (!confirm(`Удалить категорию "${name}"?`)) return;
+  try {
+    if (db) { await deleteDoc(doc(db, 'categories', id)); await loadAll(); }
+    showToast('Категория удалена', 'success');
+  } catch(e) { showToast('Ошибка удаления', 'error'); }
+};
+
+// ── FILTER ──
+window.filterManageTable = function() {
+  const q    = document.getElementById('manageSearch').value.toLowerCase();
+  const cat  = document.getElementById('manageCatFilter').value;
+  document.querySelectorAll('#manageTable tr').forEach(row => {
+    const name = row.dataset.name || '';
+    const rc   = row.dataset.cat || '';
+    const show = name.includes(q) && (!cat || rc === cat);
+    row.style.display = show ? '' : 'none';
+  });
+};
+
+// ── HELPERS ──
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert alert-${type} visible`;
+  setTimeout(() => el.classList.remove('visible'), 4000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+loadAll();
+</script>
+
+<script>
+// ===== PASSWORD CHECK (runs before Firebase) =====
+const ADMIN_PASSWORD = 'baha2024'; // ← Change this!
+
+function checkPassword() {
+  const val = document.getElementById('adminPass').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminApp').classList.remove('hidden');
+    sessionStorage.setItem('baha_admin', '1');
+  } else {
+    document.getElementById('loginError').textContent = 'Неверный пароль / Nädogry açar söz';
+    document.getElementById('adminPass').value = '';
+  }
+}
+
+// Enter key
+document.getElementById('adminPass').addEventListener('keypress', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+// Auto-login if already authenticated in this session
+if (sessionStorage.getItem('baha_admin') === '1') {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('adminApp').classList.remove('hidden');
+}
+
+// ===== PAGE NAVIGATION =====
+const pages = ['dashboard','products','categories','manage','ads'];
+const titles = { dashboard:'Дашборд', products:'Добавить товар', categories:'Категории', manage:'Управление товарами', ads:'Google AdSense' };
+
+function showPage(name) {
+  pages.forEach(p => {
+    document.getElementById('page-' + p)?.classList.toggle('active', p === name);
+    document.getElementById('nav-'  + p)?.classList.toggle('active', p === name);
+  });
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+}
+
+function logout() {
+  sessionStorage.removeItem('baha_admin');
+  location.reload();
+}
+
+// ===== EMOJI PICKER =====
+function selectEmoji(emoji) {
+  document.querySelectorAll('.emoji-opt').forEach(el => {
+    el.classList.toggle('selected', el.dataset.emoji === emoji);
+  });
+  document.getElementById('pEmoji').value = emoji;
+}
+
+document.querySelectorAll('.emoji-opt').forEach(el => {
+  el.addEventListener('click', () => selectEmoji(el.dataset.emoji));
+});
+
+// ===== COPY CODE =====
+function copyCode(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('toast');
+    t.textContent = '📋 Скопировано!';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  });
+}
+</script>
+
+</body>
+</html>
