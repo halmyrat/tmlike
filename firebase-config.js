@@ -24,12 +24,12 @@ import { getStorage }          from "https://www.gstatic.com/firebasejs/10.7.1/f
 
 // ⬇ Replace these values with your own Firebase project config
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyBXGQ5w7XkqaQOw0O9cHR2uF65sr8A2wF8",
+  authDomain:        "tmlikeonline.firebaseapp.com",
+  projectId:         "tmlikeonline",
+  storageBucket:     "tmlikeonline.firebasestorage.app",
+  messagingSenderId: "788385897433",
+  appId:             "1:788385897433:web:df47ea2c1cee52783ed7c8"
 };
 
 // Initialize
