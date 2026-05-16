@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Реклама на BAHA — Продвижение товаров в Туркменистане</title>
+  <meta name="description" content="Разместите рекламу на BAHA и охватите тысячи покупателей Туркменистана.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .adv-hero {
+      background: linear-gradient(135deg, #1C1410 0%, #3A1F1A 50%, #2C1A10 100%);
+      padding: 64px 0 72px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .adv-hero::before {
+      content: ''; position: absolute;
+      top: -80px; right: -80px; width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(201,148,42,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .adv-hero-label { font-size: 12px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .adv-hero-title { font-family: var(--font-display); font-size: clamp(28px, 4vw, 48px); font-weight: 700; color: #FFFDF8; line-height: 1.15; margin-bottom: 16px; }
+    .adv-hero-sub { font-size: 17px; color: rgba(255,253,248,0.6); max-width: 520px; margin: 0 auto 32px; line-height: 1.65; }
+    .adv-stats { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; }
+    .adv-stat-num { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--gold); line-height: 1; }
+    .adv-stat-label { font-size: 13px; color: rgba(255,253,248,0.5); margin-top: 4px; }
+
+    .packages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-bottom: 56px; }
+    .package-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 28px 24px; position: relative; transition: var(--transition); }
+    .package-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); }
+    .package-card.featured { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+    .package-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 20px; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; }
+    .package-icon { font-size: 36px; margin-bottom: 14px; }
+    .package-name { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+    .package-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6; }
+    .package-price { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: var(--text); line-height: 1; margin-bottom: 4px; }
+    .package-price span { font-size: 16px; font-weight: 400; color: var(--text-muted); }
+    .package-feature { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+    .package-feature::before { content: '✓'; color: var(--success); font-weight: 700; flex-shrink: 0; }
+    .btn-select-package { width: 100%; margin-top: 22px; padding: 13px; border-radius: 50px; font-size: 14px; font-weight: 500; transition: var(--transition); border: 1.5px solid var(--border); color: var(--text); background: var(--surface); cursor: pointer; }
+    .btn-select-package:hover, .btn-select-package.selected { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .package-card.featured .btn-select-package { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .adv-form-wrap { max-width: 640px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px; }
+    .adv-form-title { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+    .adv-form-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-grp { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-lbl { font-size: 13px; font-weight: 500; }
+    .form-lbl span { color: var(--primary); }
+    .form-inp, .form-sel, .form-txt { padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.18s; font-family: var(--font-body); }
+    .form-inp:focus, .form-sel:focus, .form-txt:focus { border-color: var(--primary); background: #fff; }
+    .form-txt { resize: vertical; min-height: 90px; }
+    .selected-package-badge { background: var(--primary-light); border: 1px solid #F0C0C0; border-radius: 10px; padding: 12px 16px; font-size: 14px; color: var(--primary); font-weight: 500; margin-bottom: 20px; display: none; align-items: center; gap: 8px; }
+    .selected-package-badge.visible { display: flex; }
+    .btn-submit-adv { width: 100%; padding: 15px; background: var(--primary); color: #fff; border-radius: 50px; font-size: 16px; font-weight: 500; transition: var(--transition); margin-top: 8px; border: none; cursor: pointer; font-family: var(--font-body); }
+    .btn-submit-adv:hover { background: var(--primary-dark); }
+    .btn-submit-adv:disabled { opacity: 0.6; cursor: not-allowed; }
+    .form-note { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 14px; line-height: 1.6; }
+    .success-box { text-align: center; padding: 48px 32px; display: none; }
+    .success-box.visible { display: block; }
+    .success-icon { font-size: 56px; margin-bottom: 16px; }
+    .success-title { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin-bottom: 10px; }
+    .success-sub { font-size: 15px; color: var(--text-muted); line-height: 1.7; }
+    .steps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
+    .step-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; text-align: center; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .step-title { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+    .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .alert { padding: 13px 18px; border-radius: 10px; font-size: 14px; margin-bottom: 18px; display: none; }
+    .alert.visible { display: block; }
+    .alert-error { background: #FAEAEA; color: var(--primary); border: 1px solid #F0C0C0; }
+    @media (max-width: 600px) { .adv-form-wrap { padding: 24px; } .form-row { grid-template-columns: 1fr; } .adv-stats { gap: 24px; } }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="container">
+      <a href="index.html" class="logo">BAHA<span class="logo-dot">.</span></a>
+      <nav class="nav">
+        <a href="index.html" style="font-size:14px;color:var(--text-muted)">← Главная</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="adv-hero">
+    <div class="container">
+      <p class="adv-hero-label">Реклама · Reklama</p>
+      <h1 class="adv-hero-title">Продвигайте ваш бренд<br>на BAHA</h1>
+      <p class="adv-hero-sub">Охватите тысячи покупателей Туркменистана. Ваш товар — наверху поиска.</p>
+      <div class="adv-stats">
+        <div class="adv-stat"><div class="adv-stat-num">10K+</div><div class="adv-stat-label">Посетителей/месяц</div></div>
+        <div class="adv-stat"><div class="adv-stat-num">8</div><div class="adv-stat-label">Категорий товаров</div></div>
+        <div class="adv-stat"><div class="adv-stat-num">2</div><div class="adv-stat-label">Языка (RU + TM)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Пакеты продвижения</h2>
+      <div class="packages-grid">
+
+        <div class="package-card">
+          <div class="package-icon">📌</div>
+          <div class="package-name">Basic</div>
+          <div class="package-desc">Идеально для малого бизнеса и отдельных брендов</div>
+          <div class="package-price">$29 <span>/ месяц</span></div>
+          <div class="package-features">
+            <div class="package-feature">Товар в топе категории (7 дней)</div>
+            <div class="package-feature">Значок «Рекомендуем»</div>
+            <div class="package-feature">До 500 показов/день</div>
+          </div>
+          <button class="btn-select-package" onclick="selectPackage(this,'Basic','$29/мес')">Выбрать</button>
+        </div>
+
+        <div class="package-card featured">
+          <div class="package-badge">⭐ Популярный</div>
+          <div class="package-icon">🚀</div>
+          <div class="package-name">Pro</div>
+          <div class="package-desc">Максимальная видимость для активно продающихся брендов</div>
+          <div class="package-price">$79 <span>/ месяц</span></div>
+          <div class="package-features">
+            <div class="package-feature">Товар на главной странице (30 дней)</div>
+            <div class="package-feature">Значок «Верифицированный бренд» ✓</div>
+            <div class="package-feature">Баннер на странице категории</div>
+            <div class="package-feature">До 3 000 показов/день</div>
+            <div class="package-feature">Отчёт о просмотрах</div>
+          </div>
+          <button class="btn-select-package selected" onclick="selectPackage(this,'Pro','$79/мес')">Выбрать</button>
+        </div>
+
+        <div class="package-card">
+          <div class="package-icon">👑</div>
+          <div class="package-name">Enterprise</div>
+          <div class="package-desc">Полное доминирование для крупных компаний и дистрибьюторов</div>
+          <div class="package-price">$199 <span>/ месяц</span></div>
+          <div class="package-features">
+            <div class="package-feature">Все товары бренда — в топе</div>
+            <div class="package-feature">Эксклюзивный баннер на главной</div>
+            <div class="package-feature">Верифицированный бренд ✓</div>
+            <div class="package-feature">Неограниченные показы</div>
+            <div class="package-feature">Ежемесячный аналитический отчёт</div>
+            <div class="package-feature">Персональный менеджер</div>
+          </div>
+          <button class="btn-select-package" onclick="selectPackage(this,'Enterprise','$199/мес')">Выбрать</button>
+        </div>
+
+      </div>
+
+      <h2 class="section-title">Как это работает</h2>
+      <div class="steps-grid" style="margin-bottom:56px">
+        <div class="step-card"><div class="step-num">1</div><div class="step-title">Заполните форму</div><div class="step-desc">Укажите бренд, контакт и нужный пакет</div></div>
+        <div class="step-card"><div class="step-num">2</div><div class="step-title">Получите счёт</div><div class="step-desc">Мы вышлем ссылку для оплаты на email в течение 24 часов</div></div>
+        <div class="step-card"><div class="step-num">3</div><div class="step-title">Оплатите картой</div><div class="step-desc">Visa, Mastercard, виртуальные карты — безопасная оплата</div></div>
+        <div class="step-card"><div class="step-num">4</div><div class="step-title">Идёт продвижение</div><div class="step-desc">Ваш товар появляется в топе в тот же день после оплаты</div></div>
+      </div>
+
+      <div class="adv-form-wrap" id="formWrap">
+        <div class="success-box" id="successBox">
+          <div class="success-icon">🎉</div>
+          <div class="success-title">Заявка отправлена!</div>
+          <p class="success-sub">Спасибо! Мы получили вашу заявку и свяжемся с вами в течение 24 часов. Вам придёт ссылка для оплаты картой на указанный email.</p>
+          <br>
+          <a href="index.html" class="btn-write-review" style="display:inline-flex;margin-top:8px">← На главную</a>
+        </div>
+
+        <div id="formContent">
+          <div class="adv-form-title">Подать заявку на рекламу</div>
+          <p class="adv-form-sub">Заполните форму — мы ответим в течение 24 часов и пришлём ссылку для оплаты картой</p>
+          <div class="selected-package-badge visible" id="selectedBadge">
+            🚀 Выбран пакет: <strong id="selectedPackageName">Pro — $79/мес</strong>
+          </div>
+          <div class="alert alert-error" id="formAlert"></div>
+          <form id="advForm" onsubmit="submitAdRequest(event)">
+            <div class="form-row">
+              <div class="form-grp">
+                <label class="form-lbl">Название компании / бренда <span>*</span></label>
+                <input type="text" class="form-inp" id="advBrand" placeholder="напр. Borges Turkmenistan" required>
+              </div>
+              <div class="form-grp">
+                <label class="form-lbl">Контактное лицо <span>*</span></label>
+                <input type="text" class="form-inp" id="advName" placeholder="Ваше имя" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label class="form-lbl">Email <span>*</span></label>
+                <input type="email" class="form-inp" id="advEmail" placeholder="email@company.com" required>
+              </div>
+              <div class="form-grp">
+                <label class="form-lbl">Телефон / WhatsApp</label>
+                <input type="tel" class="form-inp" id="advPhone" placeholder="+993 ...">
+              </div>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Пакет <span>*</span></label>
+              <select class="form-sel" id="advPackage" required>
+                <option value="">— Выберите пакет —</option>
+                <option value="Basic — $29/мес">📌 Basic — $29/месяц</option>
+                <option value="Pro — $79/мес" selected>🚀 Pro — $79/месяц</option>
+                <option value="Enterprise — $199/мес">👑 Enterprise — $199/месяц</option>
+              </select>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Товары / категории для продвижения <span>*</span></label>
+              <textarea class="form-txt" id="advProducts" rows="3" placeholder="напр. Оливковое масло Borges Extra Virgin..." required></textarea>
+            </div>
+            <div class="form-grp">
+              <label class="form-lbl">Дополнительные пожелания</label>
+              <textarea class="form-txt" id="advNotes" rows="2" placeholder="Любые вопросы или пожелания..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit-adv" id="advSubmitBtn">Отправить заявку →</button>
+            <p class="form-note">После отправки мы вышлем безопасную ссылку для оплаты картой (Visa / Mastercard / виртуальные карты) на ваш email. Никаких скрытых платежей.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <a href="index.html" class="logo">BAHA<span class="logo-dot">.</span></a>
+      <p style="margin-top:6px">© 2024 · Рейтинг товаров Туркменистана</p>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBXGQ5w7XkqaQOw0O9cHR2uF65sr8A2wF8",
+      authDomain:        "tmlikeonline.firebaseapp.com",
+      projectId:         "tmlikeonline",
+      storageBucket:     "tmlikeonline.firebasestorage.app",
+      messagingSenderId: "788385897433",
+      appId:             "1:788385897433:web:df47ea2c1cee52783ed7c8"
+    };
+    let db;
+    try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } catch(e) {}
+
+    function selectPackage(btn, name, price) {
+      document.querySelectorAll('.btn-select-package').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const val = name + ' — ' + price;
+      document.getElementById('advPackage').value = val;
+      document.getElementById('selectedPackageName').textContent = val;
+      document.getElementById('selectedBadge').classList.add('visible');
+      document.getElementById('formWrap').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    async function submitAdRequest(e) {
+      e.preventDefault();
+      const btn = document.getElementById('advSubmitBtn');
+      btn.disabled = true; btn.textContent = 'Отправляем...';
+      const data = {
+        brand:    document.getElementById('advBrand').value.trim(),
+        contact:  document.getElementById('advName').value.trim(),
+        email:    document.getElementById('advEmail').value.trim(),
+        phone:    document.getElementById('advPhone').value.trim(),
+        package:  document.getElementById('advPackage').value,
+        products: document.getElementById('advProducts').value.trim(),
+        notes:    document.getElementById('advNotes').value.trim(),
+        status:   'new',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      try {
+        if (db) await db.collection('adRequests').add(data);
+        document.getElementById('formContent').style.display = 'none';
+        document.getElementById('successBox').classList.add('visible');
+      } catch(err) {
+        const al = document.getElementById('formAlert');
+        al.textContent = 'Ошибка отправки. Попробуйте позже.';
+        al.classList.add('visible');
+        btn.disabled = false; btn.textContent = 'Отправить заявку →';
+      }
+    }
+  </script>
+</body>
+</html>

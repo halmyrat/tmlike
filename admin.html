@@ -380,6 +380,10 @@
       <div class="nav-item" onclick="showPage('manage')" id="nav-manage">
         <span class="nav-icon">✏️</span> Управление
       </div>
+      <div class="nav-item" onclick="showPage('requests')" id="nav-requests">
+        <span class="nav-icon">📬</span> Заявки на рекламу
+        <span id="requestsBadge" style="margin-left:auto;background:var(--primary);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;display:none">0</span>
+      </div>
       <div class="nav-item" onclick="showPage('ads')" id="nav-ads">
         <span class="nav-icon">💰</span> Google Ads
       </div>
@@ -603,6 +607,41 @@
       </div>
 
       <!-- =================== GOOGLE ADS =================== -->
+      <!-- =================== AD REQUESTS =================== -->
+      <div class="page" id="page-requests">
+        <div class="card" style="margin-bottom:18px;background:var(--warn-bg);border-color:#E8D08A">
+          <div style="font-size:13px;color:#7A5C1A;line-height:1.8">
+            <strong>💳 Как обработать заявку:</strong><br>
+            1. Откройте <a href="https://app.mercury.com" target="_blank" style="color:#7A5C1A;text-decoration:underline">app.mercury.com</a> → <strong>Send Invoice</strong><br>
+            2. Введите email клиента и сумму из его пакета<br>
+            3. Отправьте — клиент получит ссылку для оплаты картой (Visa / Mastercard)<br>
+            4. После оплаты обновите статус заявки на "Оплачено" и активируйте продвижение
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">📬 Заявки на рекламу</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Бренд</th>
+                  <th>Контакт</th>
+                  <th>Email</th>
+                  <th>Пакет</th>
+                  <th>Товары</th>
+                  <th>Дата</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTable">
+                <tr><td colspan="8" class="empty-table">Загрузка...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <div class="page" id="page-ads">
         <div class="card" style="background:var(--warn-bg);border-color:#E8D08A;margin-bottom:24px">
           <div style="font-size:14px;color:#7A5C1A;line-height:1.8">
@@ -953,7 +992,65 @@ function showToast(msg) {
 }
 
 // Auto-load once admin is visible
-document.addEventListener('DOMContentLoaded', () => { loadAll(); });
+document.addEventListener('DOMContentLoaded', () => { loadAll(); loadAdRequests(); });
+
+// ── AD REQUESTS ──
+async function loadAdRequests() {
+  if (!db) return;
+  try {
+    const snap = await db.collection('adRequests').orderBy('createdAt','desc').get();
+    const requests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const newCount = requests.filter(r => r.status === 'new').length;
+
+    // Update badge
+    const badge = document.getElementById('requestsBadge');
+    if (badge) {
+      badge.textContent = newCount;
+      badge.style.display = newCount > 0 ? 'inline-block' : 'none';
+    }
+
+    const tb = document.getElementById('requestsTable');
+    if (!tb) return;
+    if (!requests.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="empty-table">Заявок пока нет. Поделитесь ссылкой на tmlike.online/advertise.html!</td></tr>';
+      return;
+    }
+    tb.innerHTML = requests.map(r => {
+      const date = r.createdAt?.toDate?.()
+        ? r.createdAt.toDate().toLocaleDateString('ru-RU', { day:'numeric', month:'short', year:'numeric' })
+        : '—';
+      const statusBadge = r.status === 'paid'
+        ? '<span class="badge badge-success">✓ Оплачено</span>'
+        : r.status === 'sent'
+        ? '<span class="badge badge-warn">📧 Счёт отправлен</span>'
+        : '<span class="badge badge-danger">● Новая</span>';
+      return `<tr>
+        <td style="font-weight:600">${r.brand||'—'}</td>
+        <td>${r.contact||'—'}</td>
+        <td><a href="mailto:${r.email}" style="color:var(--primary)">${r.email||'—'}</a></td>
+        <td><strong>${r.package||'—'}</strong></td>
+        <td style="font-size:12px;color:var(--text-muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.products||''}">${r.products||'—'}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${date}</td>
+        <td>${statusBadge}</td>
+        <td style="display:flex;gap:6px;flex-wrap:wrap">
+          <a href="mailto:${r.email}?subject=BAHA Реклама — Ссылка для оплаты&body=Здравствуйте, ${r.contact}!%0A%0AСпасибо за заявку на продвижение на BAHA.%0AВаш пакет: ${r.package}%0A%0AСсылка для оплаты картой: [ВСТАВЬТЕ ССЫЛКУ MERCURY]%0A%0AПосле оплаты ваш бренд будет активирован в течение 24 часов.%0A%0AС уважением,%0ABAHA Team%0Atmlike.online" class="btn-primary" style="padding:6px 12px;font-size:12px;border-radius:6px;text-decoration:none">📧 Отправить счёт</a>
+          <button class="btn-danger" onclick="markPaid('${r.id}')" style="font-size:12px">✓ Оплачено</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    console.warn('Requests load error:', e);
+  }
+}
+
+window.markPaid = async function(id) {
+  if (!db) return;
+  try {
+    await db.collection('adRequests').doc(id).update({ status: 'paid' });
+    showToast('Статус обновлён — Оплачено ✓');
+    loadAdRequests();
+  } catch(e) { showToast('Ошибка обновления'); }
+};
 </script>
 
 <script>
@@ -984,8 +1081,8 @@ if (sessionStorage.getItem('baha_admin') === '1') {
 }
 
 // ===== PAGE NAVIGATION =====
-const pages = ['dashboard','products','categories','manage','ads'];
-const titles = { dashboard:'Дашборд', products:'Добавить товар', categories:'Категории', manage:'Управление товарами', ads:'Google AdSense' };
+const pages = ['dashboard','products','categories','manage','requests','ads'];
+const titles = { dashboard:'Дашборд', products:'Добавить товар', categories:'Категории', manage:'Управление товарами', requests:'Заявки на рекламу', ads:'Google AdSense' };
 
 function showPage(name) {
   pages.forEach(p => {
